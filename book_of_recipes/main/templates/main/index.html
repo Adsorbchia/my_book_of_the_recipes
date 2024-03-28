@@ -1,0 +1,36 @@
+ {% extends 'base.html' %} 
+{% load static %}
+    {% block content %}
+    <h1 class="mt-5 pt-3"><strong>{{ content }}</strong></h1>
+   {% for card in recipes %}
+  <!-- Карта товара -->
+  <div class="col-lg-4 col-md-6 p-4 ">
+      <div class="card border-primary rounded custom-shadow">
+        {% if card.image %}
+         <img src="{{ card.image.url }}" class="card-img-top" alt="{{ card.name_recipe }}">
+         {% else %}
+         <img src="{% static 'deps/images/Not found image.png' %}" class="card-img-top" alt="{{ card.name_recipe }}">
+        {% endif %}
+          <div class="card-body">
+              <a href=" {% url "recipe_catalog:recipe" card.slug %}">
+                  <p class="card-title">{{ card.name_recipe }}</p>
+              </a>
+              <p class="card-text text-truncate"><strong>Время приготовления:</strong> {{ card.cooking_time }} мин</p>
+              <p class="card-text text-truncate"><strong>Категория:</strong> {{ card.category }}</p>
+              <p class="product_id">{{card.author }}</p>
+              <div class="d-flex justify-content-between">
+        
+              </div>
+          </div>
+      </div>
+  </div>
+  {% endfor %}
+    {% endblock %}
+    
+    {% block footer %}
+    <footer class="py-4 bg-primary sticky-bottom">
+        <div class="container">
+            <p class="m-0 text-center text-white"> COOKING at HOME; The site was created in Python using the framework Django</p>
+        </div>
+    </footer>    
+    {% endblock%}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content  %}
+{% if authors %}
+{% for item in authors %}
+<div class="col-lg-4 col-md-6 p-4" >
+    <div class="card border-primary rounded custom-shadow">
+        {% if item.creator.image %}
+        <img src="{{ item.creator.image.url }}" class="card-img-top" alt="{{ item.creator }}">
+        {% else %}
+        <img src="{% static 'deps/images/baseavatar.jpg' %}" class="card-img-top" alt="{{ item.creator }}">
+        {% endif %}
+        <div class="card-body">
+            <a href="{% if user.id == item.creator.id %}{% url 'user:profile_user' %}{% else %}
+            {% url 'main:creator' item.creator.id %}{% endif %}">
+                <p class="card-title">{{ item.creator }}</p>
+            </a>
+        
+            </div>
+        </div>
+    </div>
+{% endfor %}  
+
+{% else %}
+<h3 class="text-center text-danger">У пользователя еще нет подписок</h3>
+{% endif %}
+
+
+{% endblock %}

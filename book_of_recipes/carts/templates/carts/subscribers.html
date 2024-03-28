@@ -1,0 +1,24 @@
+{% block content  %}
+{% if  subscribers %}
+{% for item in subscribers %}
+<div class="col-lg-4 col-md-6 p-4">
+    <div class="card border-primary rounded custom-shadow">
+        {% if item.user.image %}
+        <img src="{{ item.user.image.url }}" class="card-img-top" alt="{{ item.user }}">
+        {% else %}
+        <img src="{% static 'deps/images/baseavatar.jpg' %}" class="card-img-top" alt="{{ item.user }}">
+        {% endif %}
+        <div class="card-body">
+            <a href="{% if user.id == item.user.id %}{% url 'user:profile_user' %}{% else %}
+            {% url 'main:creator' item.user.id %}{% endif %}">
+                <p class="card-title">{{ item.user }}</p>
+            </a>
+    
+            </div>
+        </div>
+    </div>
+{% endfor %}  
+{% else %}
+<h3 class="text-center text-danger">На пользователя еще никто не подписан</h3>
+{% endif %}
+{% endblock %}

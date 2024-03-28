@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load cart_tags %}
+{% block content %}
+      <!-- Контент на странице -->
+      <div class="bg-white p-4 mb-4 rounded custom-shadow row">
+        <div class="col-8 p-lg-5">
+            <h2 class="text-sm-center text-primary"><strong>Книга рецептов</strong></h2>
+            <br>
+            {% for recipe in recipes %}
+            <div class="card mb-3 border-primary" style="max-width: 540px;">
+              <div class="row g-0">
+                <div class="col-md-4">
+                  {% if recipe.image %}
+                  <img src="{{ recipe.image.url }}" class="img-fluid rounded-start" alt="{{ recipe.name_recipe }}"> 
+                  {% else %}
+                  <img src="{% static 'deps/images/Not found image.png' %}" class="img-fluid rounded-start" alt="{{ recipe.name_recipe }}">
+                  {% endif %}
+                </div>
+                <div class="col-md-8">
+                  <div class="card-body">
+                    <h5 class="card-title text-danger">{{ recipe.category }}</h5>
+                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" 
+                    href="{% url 'recipe_catalog:recipe' recipe.slug %}">
+                      <strong><h5 class="card-title">{{ recipe.name_recipe }}</h5></strong></a>
+                    <p class="card-text"><strong>Время приготовления:</strong> {{ recipe.cooking_time }} мин</p>
+                    <p class="card-text"><small class="text-body-secondary">{{ user.first_name }} добавил(а) рецепт:</strong> {{ recipe.date_of_creation }} </small></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+              {% endfor %}
+          </div>
+        <div class="col-4 m-5" style="width: 200px;">
+            {% if user.image  %}
+                <img src="{{ user.image.url }}"
+                    alt="Аватар пользователя" class="img-fluid rounded-circle rounded mx-auto d-block" 
+                    style="max-width: 150px;">
+                {% else %}
+                <img src="{% static 'deps/images/baseavatar.jpg' %}"
+                alt="Аватар пользователя" class="img-fluid rounded-circle rounded mx-auto d-block"
+                style="max-width: 150px;">
+                {% endif %}
+                <h3 class=" text-primary text-center">{{ user }}</h3>
+                  <div class="text-center">
+                    <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      {% quantity_subscribers user.id as subscribers %}
+                      Подписчики
+                      <a href="{% url 'cart:subscribers' user.id %}">
+                        <span class="badge text-bg-primary rounded-pill">{{ subscribers }}</span>
+                      </a>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      {% quantity_favorite_authors  user.id as quantity %} 
+                      Подписки
+                      <a href="{% url 'cart:favorite_authors' user.id %}">
+                        <span class="badge text-bg-primary rounded-pill">{{ quantity }}</span>
+                      </a>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      {% favorites_recipes request as  quantity_favrecipes %}
+                      Избранное
+                      <a href="{% url 'cart:favorite_recipes' %}"><span class="badge text-bg-primary rounded-pill">{{ quantity_favrecipes.count }}</span></a>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      {%  user_recipe  user.id as quantity_recipes %}
+                      Рецепты
+                      <span class="badge text-bg-primary rounded-pill">{{ quantity_recipes.count }}</span>
+                    </li>
+                  </ul>
+                  <div class="list-group">
+                    <a href="{% url 'user:user_settings' %}" class="list-group-item list-group-item-action list-group-item-info">
+                      Изменить данные
+                    </a>
+                  </div>
+                  </div>
+          </div>
+      
+          </div>
+      </div>           
+{% endblock %}

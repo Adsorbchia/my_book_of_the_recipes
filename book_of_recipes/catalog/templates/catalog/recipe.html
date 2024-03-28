@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load cart_tags %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card mb-4 custom-shadow">
+        <div class="row">
+            <!-- Миниатюры -->
+            <div class="col-md-4">
+                {% if recipe.image %}
+                <img src="{{ recipe.image.url }}" height="663" class="img-thumbnail" data-bs-toggle="modal" data-bs-target="#imageModal1" 
+                alt="{{ recipe.name_recipe }}">
+                {% else %}
+                <img src="{% static 'deps/images/Not found image.png' %}" height="663" class="img-thumbnail" data-bs-toggle="modal" data-bs-target="#imageModal1" alt="{{ recipe.name_recipe }}">
+                {% endif %}
+            </div>
+        
+            <div class="modal fade" id="imageModal1" tabindex="-1"
+                aria-labelledby="imageModal1Label" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="imageModal1Label">{{ recipe.name_recipe|truncatewords:4 }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Закрыть"></button>
+                        </div>
+                        <div class="modal-body">
+                            {% if recipe.image %}
+                            <img src="{{ recipe.image.url }}" class="img-fluid" alt="{{ recipe.name_recipe }}">
+                            {% else %}
+                            <img src="{% static 'deps/images/Not found image.png' %}" class="img-fluid" alt="{{ recipe.name_recipe }}">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+       
+        <!-- Описание товара -->
+        <div class="card-body">
+            <strong><h5 class="card-title">{{ recipe.name_recipe }}</h5></strong>
+            <p class="card-text">{{ recipe.description }}</p>
+            <p class="card-text"><strong>Ингредиенты:</strong> {{ recipe.ingredients }}</p>
+            <p class="card-text"><strong>Рецепт</strong> {{ recipe.cooking_steps }}</p>
+            <p class="card-text"><strong>Время приготовления:</strong> {{ recipe.cooking_time }} мин</p>
+            <div>
+                <p class="card-text"><a 
+                    class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover"
+                    href="{% url 'main:creator' recipe.author.id %}">
+                    Автор: {{ recipe.author}}</a></p>
+                <p class="card-text">
+                    {% if recipe.author == user %}<a href="{% url 'user:change_the_recipe' recipe.slug %}">
+                    <button class="btn btn-primary">Редактировать рецепт</button></a>
+                    <a href="{% url 'user:remove' recipe.slug %}">
+                    <button class="btn btn-primary">Удалить рецепт</button></a>
+                </p>{% endif %}
+                </div>     
+
+               
+        </div>
+     
+            <div class="col-md-4 " id="favorites-selection" >
+                {% total_number_of_favorites recipe.slug as favorites %}
+                {% checking_for_a_favorites request recipe.id as like %}
+                {% if user.is_authenticated %}
+                <p class="mt-3">
+                    {% if like %}
+                    <a href="{% url 'cart:cart_add' recipe.id %}"><button class="btn "><img src="{% static 'deps/icons/star2.svg' %}" alt="Catalog Icon"></button></a>
+                    {% else %}
+                    <a href="{% url 'cart:cart_add' recipe.id %}"><button  class="btn "><img src="{% static 'deps/icons/star.svg' %}" alt="Catalog Icon"></button></a>
+                    {% endif %}
+                    <span class=" text-secondary" id="goods-in-cart-count">{{ favorites.total_number }}</span> </a>
+                </p>
+                    {% endif %}
+</div>
+{% endblock %} 

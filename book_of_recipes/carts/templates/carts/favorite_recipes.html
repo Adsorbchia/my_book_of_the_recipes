@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load cart_tags %}
+{% block content  %}
+{% favorites_recipes request as favorites %}   
+<div class="row">    
+{% for favorite in favorites %}
+<div class="col-lg-4 col-md-6 p-4" id="cart-items-container">
+    <div class="card border-primary rounded custom-shadow">
+        {% if favorite.recipe.image %}
+        <img src="{{ favorite.recipe.image.url }}" class="card-img-top" alt="{{ favorite.recipe.name_recipe }}">
+        {% else %}
+        <img src="{% static 'deps/images/Not found image.png' %}" class="card-img-top" alt="{{ favorite.recipe.name_recipe }}">
+        {% endif %}
+        <div class="card-body">
+            <a href="{% url 'recipe_catalog:recipe' favorite.recipe.slug %}">
+                <p class="card-title">{{ favorite.recipe.name_recipe|truncatewords:4 }}</p>
+            </a>
+            <p class="card-text text-truncate"><strong>Время приготовления:</strong> {{favorite.recipe.cooking_time }} мин</p>
+            <p class="card-text text-truncate"><strong>Категория:</strong> {{favorite.recipe.recipe.category }}</p>
+            <p class="product_id">{{ favorite.recipe.author }}</p>
+            <div class="d-flex justify-content-between">
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+
+{% endblock %}

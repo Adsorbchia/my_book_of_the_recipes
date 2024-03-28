@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load cart_tags %}
+{% block content  %}
+{% user_recipe user.id as recipes %}   
+<div class="row">
+    {% if recipes %}    
+{% for recipe in recipes %}
+<div class="col-lg-4 col-md-6 p-4">
+    <div class="card border-primary rounded custom-shadow">
+        {% if recipe.image %}
+        <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.name_recipe }}">
+        {% else %}
+        <img src="{% static 'deps/images/Not found image.png' %}" class="card-img-top" alt="{{ recipe.name_recipe }}">
+        {% endif %}
+        <div class="card-body">
+            <a href="{% url 'recipe_catalog:recipe' recipe.slug %}">
+                <p class="card-title">{{ recipe.name_recipe|truncatewords:4 }}</p>
+            </a>
+            <p class="card-text text-truncate"><strong>Время приготовления:</strong> {{recipe.cooking_time }} мин</p>
+            <p class="card-text text-truncate"><strong>Категория:</strong> {{ recipe.category }}</p>
+            <p class="product_id">{{ recipe.author }}</p>
+            <div class="d-flex justify-content-between">
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+
+    <div class="card border-primary rounded custom-shadow col-lg-4 col-md-6 p-4">
+<h4> У вас пока нет собственных рецептов! </h4>
+
+    <a class="btn btn-primary " href="{% url 'user:user_add_recipe' %}" role="button">Добавить рецепт</a>
+    <br>
+    <a class="btn btn-primary" href="{% url 'main:index' %}" role="button">Нет, вернусь позже</a>
+</div>

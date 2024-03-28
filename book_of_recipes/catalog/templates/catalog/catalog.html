@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load recipe_tags %}
+{% block content %}
+<div class="dropdown mb-2 m-5 pt-3">
+    <button class="btn btn-secondary dropdown-toggle btn-dark" type="button" data-bs-toggle="dropdown"
+        aria-expanded="false">
+        Фильтры
+    </button>
+    <form action=" {% if request.GET.q %}{% url 'recipe_catalog:search' %}{% else %}{% url 'recipe_catalog:catalog' slug_url %}{% endif %}" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
+        <div class="form-check text-white mx-3">
+            <input class="form-check-input" type="checkbox" name="on_image" id="flexCheckDefault" value="on" 
+            {% if request.GET.on_image == 'on' %}checked{% endif %}>
+            {% if request.GET.q %}
+            <input type="hidden" name="q" value="{{ request.GET.q }}">
+            <label class="form-check-label" for="flexCheckDefault">
+            {% endif %}
+                Все рецепты с изображением
+            </label>
+        </div>
+        <p class="text-white mx-3 mt-3">Сортировать:</p>
+        <div class="form-check text-white mx-3">
+            <input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault1" value="default" checked
+            {% if not request.GET.order_by or request.GET.order_by == 'default' %}checked{% endif %}>
+            <label class="form-check-label" for="flexRadioDefault1">
+                По умолчанию
+            </label>
+        </div>
+        <div class="form-check text-white mx-3">
+            <input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault2" value="cooking_time" 
+            {% if request.GET.order_by == 'cooking_time' %}checked{% endif %}>
+            <label class="form-check-label" for="flexRadioDefault2">
+                От самых быстрых к самым долгим по времени приготовления
+            </label>
+        </div>
+        <div class="form-check text-white mx-3">
+            <input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault3" value="-cooking_time"
+            {% if request.GET.order_by == '-cooking_time' %}checked{% endif %}>
+            <label class="form-check-label" for="flexRadioDefault3">
+                От самых долгих к самым быстрым по времени приготовления
+            </label>
+        </div>
+        <button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
+    </form>
+</dirow>
+
+{% if request.GET.q %}
+    <h3 class="mt-4">Результаты поиска по запросу {{ request.GET.q }}</h3>
+{% if  not recipes %}
+<link rel="stylesheet" href="{% static 'deps/css/my_footer_css.css' %}">
+<h2 class = "mt-4">По вашему запросу ничего не найдено</h2> 
+{% endif %}
+{% endif %} 
+<div class="row">     
+    {% for card in  recipes %}
+    <!-- Карта товара -->
+    <div class="col-lg-4 col-md-6 p-4">
+        <div class="card border-primary rounded custom-shadow">
+            {% if card.image %}
+            <img src="{{ card.image.url }}" class="card-img-top" alt="{{ card.name_recipe }}">
+            {% else %}
+            <img src="{% static 'deps/images/Not found image.png' %}" class="card-img-top" alt="{{ card.name_recipe }}">
+            {% endif %}
+            <div class="card-body">
+                <a href="{% url 'recipe_catalog:recipe' card.slug %}">
+                    <p class="card-title">{{ card.name_recipe|truncatewords:4 }}</p>
+                </a>
+                <p class="card-text text-truncate"><strong>Время приготовления:</strong> {{card.cooking_time }} мин</p>
+                <p class="card-text text-truncate"><strong>Категория:</strong> {{card.category }}</p>
+                <p class="product_id">{{ card.author }}</p>
+                <div class="d-flex justify-content-between">
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if recipes %}
+<!-- Пагинация -->
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center my-4">
+        <div class="custom-shadow d-flex">
+            <li class="page-item {% if not recipes.has_previous %}disabled{% endif %}">
+              <a class="page-link" href="{% if recipes.has_previous %}?{% change_params page=recipes.previous_page_number %}
+              {% else %}
+              #
+              {% endif %}">
+                Назад</a>
+            </li>
+            {% for page in recipes.paginator.page_range %}
+            {% if page >= recipes.number|add:-2 and  page <= recipes.number|add:2 %}
+            <li class="page-item {% if recipes.number == page %}active{% endif %} ">
+                <a class="page-link" href="?{% change_params page=page %}">{{ page }}</a></li>
+            {% endif %}
+            {% endfor %}   
+            <li class="page-item {% if not recipes.has_next %}disabled{% endif %}">
+                <a class="page-link" href="{% if recipes.has_next %}?{% change_params page=recipes.next_page_number %}
+                {% else %}
+                #
+                {% endif %}">
+                  Следующая</a>
+              </li>
+        </div>
+    </ul>
+</nav>  
+{% endif %}
+    
+ {% endblock %} 
