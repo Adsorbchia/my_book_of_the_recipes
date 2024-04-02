@@ -1,25 +1,17 @@
-from django.shortcuts import render
-from catalog.models import Category, Recipe
-from users.models import User
+from django.views.generic import ListView, TemplateView
+from catalog.models import Recipe
 
 
+class MainPage(ListView):
+    template_name = "main/index.html"
+    context_object_name = "recipes"
+    title_page = "COOKING at HOME - Главная"
+    paginate_by = 5
 
-def index(request):
-    categories = Category.objects.all()
-
-    recipes = Recipe.objects.filter(cooking_time__lt=35)[:5]
-
-    context = {
-        "title": "COOKING at HOME - Главная",
-        "content": "COOKING at HOME - книга полезных рецептов",
-        "categories": categories,
-        "recipes": recipes,
-    }
-    return render(request, "main/index.html", context)
+    def get_queryset(self):
+        return Recipe.objects.filter(cooking_time__lt=35)
 
 
-def about(request):
-    context = {"title": "COOKING at HOME - О нас"}
-    return render(request, "main/about.html", context)
-
-
+class AboutPage(TemplateView):
+    template_name = "main/about.html"
+    title_page = "COOKING at HOME - О нас"

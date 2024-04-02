@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load cart_tags %}
+{% block content %}
+      <!-- Контент на странице -->
+      <div class="bg-white p-4 mb-4 rounded custom-shadow row">
+        <div class="col-8 p-lg-5">
+            <h2 class="text-sm-center text-primary"><strong>Книга рецептов</strong></h2>
+            <br>
+            {% for recipe in recipes %}
+            <div class="card mb-3 border-primary" style="max-width: 540px;">
+              <div class="row g-0">
+                <div class="col-md-4">
+                  {% if recipe.image %}
+                  <img src="{{ recipe.image.url }}" class="img-fluid rounded-start" alt="{{ recipe.name_recipe }}"> 
+                  {% else %}
+                  <img src="{% static 'deps/images/Not found image.png' %}" class="img-fluid rounded-start" alt="{{ recipe.name_recipe }}">
+                  {% endif %}
+                </div>
+                <div class="col-md-8">
+                  <div class="card-body">
+                    <h5 class="card-title text-danger">{{ recipe.category }}</h5>
+                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" 
+                    href="{% url 'recipe_catalog:recipe' recipe.slug %}">
+                      <strong><h5 class="card-title">{{ recipe.name_recipe }}</h5></strong></a>
+                    <p class="card-text"><strong>Время приготовления:</strong> {{ recipe.cooking_time }} мин</p>
+                    <p class="card-text"><small class="text-body-secondary">{{ creator.first_name }} добавил(а) рецепт:</strong> {{ recipe.date_of_creation }} </small></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+              {% endfor %}
+          </div>
+        <div class="col-4 m-5" style="width: 200px;">
+          
+          {% for creator in creator  %}
+          
+            {% if creator.image  %}
+                <img src="{{ creator.image.url }}"
+                    alt="Аватар пользователя" class="img-fluid rounded-circle rounded mx-auto d-block" 
+                    style="max-width: 150px;">
+                {% else %}
+                <img src="{% static 'deps/images/baseavatar.jpg' %}"
+                alt="Аватар пользователя" class="img-fluid rounded-circle rounded mx-auto d-block"
+                style="max-width: 150px;">
+                {% endif %}
+                <h3 class=" text-primary text-center">{{ creator }}</h3>
+          
+                  <div class="text-center">
+                    
+                      <ul class="list-group">
+                     <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {% quantity_subscribers creator.id as subscribers %}
+                        Подписчики
+                        <a href="{% url 'cart:subscribers' creator.id %}">
+                          <span class="badge text-bg-primary rounded-pill">{{ subscribers }}</span>
+                        </a>
+                      </li>
+                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {% quantity_favorite_authors  creator.id as quantity %} 
+                        Подписки
+                        <a href="{% url 'cart:favorite_authors' creator.id %}">
+                          <span class="badge text-bg-primary rounded-pill">{{ quantity }}</span>
+                        </a>
+                      </li> 
+                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Рецепты
+                        {%  user_recipe  creator.id as quantity_recipes %}
+                        <span class="badge text-bg-primary rounded-pill">{{ quantity_recipes.count }}</span>
+                      </li>
+                    </ul>
+                    {% if user.is_authenticated %}
+                    <div class="list-group">
+                      {% checking_for_a_subscription request creator.id as check %} 
+                      {% if check == 1 %}
+                        <a href="{% url 'cart:create_subscription' creator.id %}" class="list-group-item list-group-item-action list-group-item-info" title="Отменить подписку"> вы подписанны </a>
+                        {% elif check == 2 %}
+                        <a href="{% url 'cart:create_subscription' creator.id %}" class="list-group-item list-group-item-action list-group-item-info">
+                          Подписаться в ответ
+                        </a>
+                        {% else %}
+                        <a href="{% url 'cart:create_subscription' creator.id %}" class="list-group-item list-group-item-action list-group-item-info">
+                          Подписаться
+                        </a>
+                      {% endif %}
+
+                      {% endif %}
+                    </div>
+                    </div>
+                  </div> 
+                  {% endfor %}
+          </div>
+      
+          </div>
+      </div>           
+{% endblock %}

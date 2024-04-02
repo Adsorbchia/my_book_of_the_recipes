@@ -1,0 +1,135 @@
+{% extends 'base.html' %} {% load static %} 
+{% load recipe_tags %}
+{% block content %}
+<div class="row">
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-9 bg-white p-4 mb-5 mx-2 rounded custom-shadow">
+        <h2 class="text-center mb-4">Редактирование рецепта</h2>
+        <form action="{% url 'catalog:change_the_recipe' recipe.slug %}" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+           <div class="col-md-6 mb-3">
+            <strong><h5 class="card-title">{{ recipe.name_recipe }}</h5></strong>
+              <input
+                type="text"
+                class="form-control"
+                id="id_name_recipe"
+                name="name_recipe"
+                value="{% if form.name_recipe.value %}{{ form.name_recipe.value }}{% endif %}"
+                placeholder="Введите название рецепта"required>
+              {% if form.name_recipe.errors %}
+              <div class="alert alert-danger alert-dismissible fade show">
+                {{ form.name_recipe.errors }}
+              </div>
+              {% endif %}
+            </div>
+            <div class="col-md-6 mb-3">
+            <input
+            type="hidden"
+            class="form-control"
+            id="id_slug"
+            name="slug"
+            value="{{form.slug.value}}"
+            required>
+          </div>
+            <div class="col-md-6 mb-3">
+              <label for="id_description" class="form-label">Описание*</label>
+              <input
+                type="text"
+                class="form-control"
+                id="id_dedescription"
+                value="{% if form.description.value %}{{ form.description.value }}{% endif %}"
+                name="description"
+                placeholder="Введите описание"
+                required>
+                {% if form.description.errors %}
+                <div class="alert alert-danger alert-dismissible fade show">
+                  {{ form.description.errors }}
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="id_ingredients" class="form-label">Ингредиенты*</label>
+              <input
+                type="text"
+                class="form-control"
+                id="id_ingredients"
+                value="{% if form.ingredients.value %}{{ form.ingredients.value }}{% endif %}"
+                name="ingredients"
+                placeholder="Введите необходимые ингредиенты" required>
+                {% if form.ingredients.errors %}<div class="alert alert-danger alert-dismissible fade show">{{ form.ingredients.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="id_cooking_steps" class="form-label">Шаги приготовления*</label>
+              <textarea cols="30" rows="20"
+                class="form-control"
+                id="id_cooking_steps"
+                name="cooking_steps"
+                placeholder="Введите шаги приготовления" required>{% if form.cooking_steps.value %}{{ form.cooking_steps.value }}{% endif %}</textarea>
+                {% if form.cooking_steps.errors %}<div class="alert alert-danger alert-dismissible fade show">{{ form.cooking_steps.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="id_cooking_time" class="form-label">Время приготовления*</label>
+              <input
+                class="form-control"
+                type="number"
+                id="id_cooking_time"
+                value="{% if form.cooking_time.value %}{{ form.cooking_time.value }}{% endif %}"
+                name="cooking_time"
+                placeholder="Введите время приготовления в мин" required>
+                {% if form.cooking_time.errors %}
+                <div class="alert alert-danger alert-dismissible fade show">
+                  {{ form.cooking_time.errors }}
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-md-6 mb-3">
+                {% if recipe.image %}
+                <img src="{{ recipe.image.url }}" class="img-fluid" alt="{{ recipe.name_recipe }}">
+                {% else %}
+                <img src="{% static 'deps/images/Not found image.png' %}" class="img-fluid" alt="{{ recipe.name_recipe }}">
+                {% endif %}   
+                    <input type="file" class="form-control mt-3" id="id_image" name="image"
+                        accept="image/*" height="663">
+                        {% if form.image.errors %}
+                        <div class="alert alert-danger alert-dismissible fade show">{{ form.image.errors }}</div>
+                        {% endif %}
+                </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_category" class="form-label">Категория*:</label>
+                {% tag_category as categories %}
+                <select
+                id="id_category"
+                name="category"
+                required>
+                <option value="">--Выберите категорию--</option>
+                {% for cat in categories  %}
+                <option  value="{{ cat.id }}">{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+            {% if form.cat.errors %}
+            <div class="alert alert-danger alert-dismissible fade show">{{ form.cat.errors }}</div>
+            {% endif %}
+            </div>
+            <div class="col-md-6 mb-3">
+              <input
+                class="form-control"
+                type="hidden"
+                id="id_author"
+                value="{{ user.id }}"
+                name="author"
+                required>
+                </div>     
+          </div>
+          <button type="submit" class="btn btn-dark btn-block btn-sm">Редактировать рецепт</button>
+        </form>
+        <br>
+        <a href="{% url 'main:index' %}"><button type="button" class="btn btn-secondary btn-sm">Отменить редактирование рецепта</button></a>
+    </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

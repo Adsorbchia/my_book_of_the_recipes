@@ -1,17 +1,36 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load recipe_tags %}
+{% block button %}
+<div class="dropdown mb-2 mt-1 pt-2">
+    <button class="btn btn-secondary dropdown-toggle btn-dark" type="button" data-bs-toggle="dropdown"
+        aria-expanded="false">
+        Рецепты
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-grid-fill" viewBox="0 0 16 16">
+            <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3z"/>
+          </svg>
+   
+    </button>
+    <ul class="dropdown-menu bg-dark" data-bs-theme="dark">
+    {%  tag_category as categories %}
+        {% for category  in categories %}
+        <li><a class="dropdown-item text-white" href='{% url "recipe_catalog:catalog" category.slug %}'>{{ category.name }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+</div>
+{% endblock %}
 {% block content %}
 <div class="dropdown mb-2 m-5 pt-3">
     <button class="btn btn-secondary dropdown-toggle btn-dark" type="button" data-bs-toggle="dropdown"
         aria-expanded="false">
         Фильтры
     </button>
-    <form action=" {% if request.GET.q %}{% url 'recipe_catalog:search' %}{% else %}{% url 'recipe_catalog:catalog' slug_url %}{% endif %}" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
+    <form action="{% url 'recipe_catalog:catalog' slug_url %}" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
         <div class="form-check text-white mx-3">
             <input class="form-check-input" type="checkbox" name="on_image" id="flexCheckDefault" value="on" 
             {% if request.GET.on_image == 'on' %}checked{% endif %}>
-            {% if request.GET.q %}
+       {% if request.GET.q %}
             <input type="hidden" name="q" value="{{ request.GET.q }}">
             <label class="form-check-label" for="flexCheckDefault">
             {% endif %}
@@ -43,16 +62,8 @@
         <button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
     </form>
 </dirow>
-
-{% if request.GET.q %}
-    <h3 class="mt-4">Результаты поиска по запросу {{ request.GET.q }}</h3>
-{% if  not recipes %}
-<link rel="stylesheet" href="{% static 'deps/css/my_footer_css.css' %}">
-<h2 class = "mt-4">По вашему запросу ничего не найдено</h2> 
-{% endif %}
-{% endif %} 
-<div class="row">     
-    {% for card in  recipes %}
+<div class="row">
+    {% for card in recipes %}
     <!-- Карта товара -->
     <div class="col-lg-4 col-md-6 p-4">
         <div class="card border-primary rounded custom-shadow">
@@ -104,6 +115,6 @@
         </div>
     </ul>
 </nav>  
-{% endif %}
-    
+{% endif %}  
  {% endblock %} 
+ 

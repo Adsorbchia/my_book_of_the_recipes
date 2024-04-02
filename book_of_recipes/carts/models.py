@@ -2,6 +2,7 @@ from django.db import models
 from django.db import models
 from catalog.models import Recipe
 from users.models import User
+from django.contrib.auth import get_user_model
 
 
 class FavouriteQuerySet(models.QuerySet):
@@ -13,7 +14,7 @@ class FavouriteQuerySet(models.QuerySet):
 
 class Favourite(models.Model):
     user = models.ForeignKey(
-        User,
+        get_user_model(),
         blank=True,
         null=True,
         on_delete=models.CASCADE,
@@ -36,6 +37,7 @@ class Favourite(models.Model):
 
     def __str__(self):
         return f"Избранное {self.user.username} | Рецепт {self.recipe.name_recipe}"
+  
 
     objects = FavouriteQuerySet.as_manager()
 

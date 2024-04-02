@@ -1,6 +1,6 @@
+from django.contrib.auth import get_user_model
 from django.db import models
-from django.db import models
-from users.models import User
+from django.urls import reverse
 from django.template.defaultfilters import slugify
 
 
@@ -73,13 +73,26 @@ class Recipe(models.Model):
     cooking_time = models.IntegerField(verbose_name="Время приготовления")
     image = models.ImageField(upload_to="recipe_image", blank=True, null=True)
     category = models.ForeignKey(
-        to=Category, on_delete=models.CASCADE, verbose_name="Категория"
+        to=Category, on_delete=models.CASCADE, verbose_name="Категория", related_name="category"
     )
     date_of_creation = models.DateTimeField(
         auto_now_add=True, verbose_name="Дата добавления рецепта"
     )
     author = models.ForeignKey(
-        to=User, on_delete=models.CASCADE, verbose_name="Автор", 
+        get_user_model(), on_delete=models.CASCADE, verbose_name="Автор", 
         related_name="authors"
     )
-   
+    class Meta:
+        db_table = "recipe"
+        verbose_name = "Рецепт"
+        verbose_name_plural = "Рецепты"
+
+    def __str__(self):
+        return self.name_recipe
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(translit_to_eng(self.name_recipe))
+        super().save(*args, **kwargs)
+    
+    def get_absolute_url(self):
+        return reverse("recipe_catalog:recipe", kwargs={"recipe_slug": self.slug})

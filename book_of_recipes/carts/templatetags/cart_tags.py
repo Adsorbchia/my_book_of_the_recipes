@@ -23,6 +23,7 @@ def user_recipe(user_id):
 def total_number_of_favorites(slug_recipe):
     recipe = Recipe.objects.get(slug=slug_recipe)
     return Favourite.objects.filter(recipe=recipe).all()
+    
 
 
 @register.simple_tag()

@@ -1,3 +1,6 @@
+{% extends 'base.html' %}
+{% load static %}
+
 {% block content  %}
 {% if  subscribers %}
 {% for item in subscribers %}
@@ -10,7 +13,7 @@
         {% endif %}
         <div class="card-body">
             <a href="{% if user.id == item.user.id %}{% url 'user:profile_user' %}{% else %}
-            {% url 'main:creator' item.user.id %}{% endif %}">
+            {% url 'user:creator' item.user.id %}{% endif %}">
                 <p class="card-title">{{ item.user }}</p>
             </a>
     

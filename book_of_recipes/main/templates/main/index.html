@@ -1,7 +1,27 @@
  {% extends 'base.html' %} 
 {% load static %}
+{% load recipe_tags %}
+{% block button %}
+<div class="dropdown mb-2 mt-1 pt-2">
+    <button class="btn btn-secondary dropdown-toggle btn-dark" type="button" data-bs-toggle="dropdown"
+        aria-expanded="false">
+        Рецепты
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-grid-fill" viewBox="0 0 16 16">
+            <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3z"/>
+          </svg>
+   
+    </button>
+    <ul class="dropdown-menu bg-dark" data-bs-theme="dark">
+    {%  tag_category as categories %}
+        {% for category  in categories %}
+        <li><a class="dropdown-item text-white" href='{% url "recipe_catalog:catalog" category.slug %}'>{{ category.name }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+</div>
+{% endblock %}
     {% block content %}
-    <h1 class="mt-5 pt-3"><strong>{{ content }}</strong></h1>
+    <h1 class="mt-5 pt-3"><strong> COOKING at HOME - книга полезных рецептов</strong></h1>
    {% for card in recipes %}
   <!-- Карта товара -->
   <div class="col-lg-4 col-md-6 p-4 ">
@@ -12,7 +32,7 @@
          <img src="{% static 'deps/images/Not found image.png' %}" class="card-img-top" alt="{{ card.name_recipe }}">
         {% endif %}
           <div class="card-body">
-              <a href=" {% url "recipe_catalog:recipe" card.slug %}">
+              <a href=" {{ card.get_absolute_url }}">
                   <p class="card-title">{{ card.name_recipe }}</p>
               </a>
               <p class="card-text text-truncate"><strong>Время приготовления:</strong> {{ card.cooking_time }} мин</p>
@@ -28,7 +48,7 @@
     {% endblock %}
     
     {% block footer %}
-    <footer class="py-4 bg-primary sticky-bottom">
+    <footer class="py-2 bg-primary sticky-bottom">
         <div class="container">
             <p class="m-0 text-center text-white"> COOKING at HOME; The site was created in Python using the framework Django</p>
         </div>

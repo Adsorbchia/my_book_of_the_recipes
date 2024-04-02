@@ -13,10 +13,9 @@
         {% endif %}
         <div class="card-body">
             <a href="{% if user.id == item.creator.id %}{% url 'user:profile_user' %}{% else %}
-            {% url 'main:creator' item.creator.id %}{% endif %}">
+            {% url 'user:creator' item.creator.id %}{% endif %}">
                 <p class="card-title">{{ item.creator }}</p>
             </a>
-        
             </div>
         </div>
     </div>

@@ -27,11 +27,12 @@
 </div>
 {% endfor %}
 {% else %}
-
-    <div class="card border-primary rounded custom-shadow col-lg-4 col-md-6 p-4">
+    <div class="bg-white mt-3 p-4 mb-4 rounded custom-shadow row">
+        <div  class="text-center">
 <h4> У вас пока нет собственных рецептов! </h4>
-
-    <a class="btn btn-primary " href="{% url 'user:user_add_recipe' %}" role="button">Добавить рецепт</a>
-    <br>
-    <a class="btn btn-primary" href="{% url 'main:index' %}" role="button">Нет, вернусь позже</a>
+<br>
+    <p><a class="btn btn-primary " href="{% url 'recipe_catalog:user_add_recipe' %}" role="button">Добавить рецепт</a></p>
 </div>
+</div>
+{% endif %}
+{% endblock %}

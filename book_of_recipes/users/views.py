@@ -1,54 +1,53 @@
+from django.db.models.query import QuerySet
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
-from django.contrib import auth, messages
+from django.urls import reverse, reverse_lazy
+from django.contrib import auth
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.shortcuts import render
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
+from django.db.models import F
+
+from .models import User
 from catalog.models import Recipe
 from users.forms import (
     UserLoginForm,
-    # UserRecipeForm,
     UserRegistrationForm,
     UserProfileForm,
+    UserPasswordChageForm,
 )
+from django.contrib.auth.views import LoginView, PasswordChangeView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-def login(request):
-    if request.method == "POST":
-        form = UserLoginForm(data=request.POST)
-        if form.is_valid():
-            username = request.POST["username"]
-            password = request.POST["password"]
-            user = auth.authenticate(username=username, password=password)
-            if user:
-                auth.login(request, user)
-                messages.success(request, f"{username}, добро пожаловать!")
-                redirect_page = request.POST.get("next", None)
-                if redirect_page and redirect_page != reverse("user:logout"):
-                    return HttpResponseRedirect(request.POST.get("next"))
+class LoginUser(LoginView):
+    form_class = UserLoginForm
+    template_name = "users/login.html"
+    extra_context = {"title": "Авторизация"}
 
-                return HttpResponseRedirect(reverse("main:index"))
-    else:
-        form = UserLoginForm()
-    context = {"title": "Авторизация", "form": form}
-    return render(request, "users/login.html", context)
+    def get_success_url(self) -> str:
+        return reverse_lazy("main:index")
 
 
+class RegistrationUser(CreateView):
+    form_class = UserRegistrationForm
+    template_name = "users/registration.html"
+    success_url = reverse_lazy("user:login")
 
-def registration(request):
-    if request.method == "POST":
-        form = UserRegistrationForm(data=request.POST)
-        if form.is_valid():
-            form.save()
-            user = form.instance
-            auth.login(request, user)
-            messages.success(request, f"{user.username}, вы успешно зарегестрированы!")
-            return HttpResponseRedirect(reverse("main:index"))
-    else:
-        form = UserRegistrationForm()
-    context = {"title": "Регистрация", "form": form}
-    return render(request, "users/registration.html", context)
 
+# def registration(request):
+#     if request.method == "POST":
+#         form = UserRegistrationForm(data=request.POST)
+#         if form.is_valid():
+#             form.save()
+#             user = form.instance
+#             auth.login(request, user)
+#             messages.success(request, f"{user.username}, вы успешно зарегестрированы!")
+#             return HttpResponseRedirect(reverse("main:index"))
+#     else:
+#         form = UserRegistrationForm()
+#     context = {"title": "Регистрация", "form": form}
+#     return render(request, "users/registration.html", context)
 
 
 @login_required
@@ -61,7 +60,7 @@ def user_settings(request):
             form.save()
             user = form.instance
             auth.login(request, user)
-            messages.success(request, "Ваш профиль успешно обновлен")
+
             return HttpResponseRedirect(reverse("user:user_settings"))
     else:
         form = UserProfileForm(instance=request.user)
@@ -71,73 +70,53 @@ def user_settings(request):
 
 
 
-@login_required
-def show_profile(request):
-    recipes = Recipe.objects.filter(author=request.user)
- 
-    context = {
-        "title": "COOKING at HOME - Страница пользователя",
-       
-        "recipes": recipes
 
-    }
-    return render(request, 'users/user_profile.html', context=context)
+class ShowProfile(LoginRequiredMixin, ListView):
+    model = auth.get_user_model()
 
-@login_required
-def logout(request):
-    messages.success(
-        request,
-        f"{request.user.username}, спасибо что были с нами, возвращайтесь скорее!",
-    )
-    auth.logout(request)
-    return redirect(reverse("main:index"))
+    template_name = "users/user_profile.html"
+    context_object_name = "recipes"
 
-
-# @login_required
-# def add_recipe(request):
-#     user = request.user
-#     if request.method == "POST":
-#         form = UserRecipeForm(data=request.POST, files=request.FILES)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, "Ваш рецепт успешно добавлен")
-#             return HttpResponseRedirect(reverse("main:index"))
-#     else:
-#         form = UserRecipeForm()
-
-#     context = {"title": "Добавление рецепта", "user": user, "form": form}
-#     return render(request, "users/user_add_recipe.html", context)
+    def get_queryset(self):
+        return Recipe.objects.filter(author=self.request.user)
 
 
 
-# @login_required
-# def change_the_recipe(request, slug_recipe):
-#     recipe = Recipe.objects.get(slug=slug_recipe)
-#     if request.method == "POST":
-#             form = UserRecipeForm(data=request.POST,instance=recipe, files=request.FILES)
-#             if form.is_valid:
-#                 form.save()
-#                 messages.success(request, "Ваш рецепт отредактирован")
-#                 return HttpResponseRedirect(reverse("main:index"))
-#     else:
-#         form = UserRecipeForm(instance=recipe)
 
-#     context = {"title": "Редактирование рецепта", 
-#                "recipe": recipe,
-#                    "form": form}
-#     return render(request, "users/change_the_recipe.html", context)
+class UserPasswordChange(PasswordChangeView):
+    form_class = UserPasswordChageForm
+    success_url = reverse_lazy("user:password_change_done")
+    template_name = "users/password_change_form.html"
 
 
 
-# @login_required
-# def remove_the_recipe(request, slug_recipe):
-#     recipe = Recipe.objects.get(slug=slug_recipe)
-#     on_delete = request.GET.get("on_delete")
-#     if on_delete == 'option1':
-#         recipe.delete()
-#         messages.success(request, "Ваш рецепт удалён")
-#         return HttpResponseRedirect(reverse("main:index"))
 
-#     context = {"title": "Удаление рецепта", 
-#                "recipe": recipe}
-#     return render(request, 'users/remove_the_recipe.html', context)
+class ShowAuthors(ListView):
+    model = auth.get_user_model()
+    template_name = "users/creators.html"
+    context_object_name = "creators"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        creators = [
+            creator for creator in context["object_list"] if creator.authors.exists()
+        ]
+        context["creators"] = creators
+        return context
+
+
+
+
+class ShowAuthorProfile(ListView):
+    template_name = "users/creators_profile.html"
+    context_object_name = "recipes"
+
+    def get_queryset(self):
+        return Recipe.objects.filter(author__id=self.kwargs["user_id"])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["creator"] = auth.get_user_model().objects.filter(
+            pk=context["recipes"][0].author.pk
+        )
+        return context
